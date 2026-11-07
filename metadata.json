@@ -1,0 +1,6 @@
+{
+  "name": "VIAGENS - Passagens Baratas de Ônibus e Avião",
+  "description": "Módulo integrável estilo Skyscanner para busca e comparação de passagens baratas de ônibus e avião.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

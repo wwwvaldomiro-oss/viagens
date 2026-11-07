@@ -1,0 +1,108 @@
+import { Company } from '../types';
+
+export const AIRLINES: Company[] = [
+  {
+    id: 'latam',
+    name: 'LATAM Airlines',
+    type: 'flight',
+    logoText: 'LATAM',
+    code: 'LA',
+    rating: 4.6,
+    color: 'from-indigo-900 to-red-600'
+  },
+  {
+    id: 'gol',
+    name: 'GOL Linhas Aéreas',
+    type: 'flight',
+    logoText: 'GOL',
+    code: 'G3',
+    rating: 4.4,
+    color: 'from-orange-500 to-amber-600'
+  },
+  {
+    id: 'azul',
+    name: 'Azul Linhas Aéreas',
+    type: 'flight',
+    logoText: 'AZUL',
+    code: 'AD',
+    rating: 4.8,
+    color: 'from-sky-700 to-blue-900'
+  },
+  {
+    id: 'voepass',
+    name: 'Voepass Linhas Aéreas',
+    type: 'flight',
+    logoText: 'VOEPASS',
+    code: '2Z',
+    rating: 4.1,
+    color: 'from-emerald-700 to-teal-800'
+  }
+];
+
+export const BUS_COMPANIES: Company[] = [
+  {
+    id: 'cometa',
+    name: 'Viação Cometa',
+    type: 'bus',
+    logoText: 'COMETA',
+    code: 'VCM',
+    rating: 4.7,
+    color: 'from-blue-700 to-sky-600'
+  },
+  {
+    id: '1001',
+    name: 'Auto Viação 1001',
+    type: 'bus',
+    logoText: '1001',
+    code: 'V1001',
+    rating: 4.6,
+    color: 'from-red-700 to-red-500'
+  },
+  {
+    id: 'buser',
+    name: 'Buser Express',
+    type: 'bus',
+    logoText: 'BUSER',
+    code: 'BSR',
+    rating: 4.5,
+    color: 'from-pink-600 to-rose-500'
+  },
+  {
+    id: 'catarinense',
+    name: 'Viação Catarinense',
+    type: 'bus',
+    logoText: 'CATARINENSE',
+    code: 'VCT',
+    rating: 4.8,
+    color: 'from-emerald-800 to-teal-700'
+  },
+  {
+    id: 'aguia-branca',
+    name: 'Viação Águia Branca',
+    type: 'bus',
+    logoText: 'ÁGUIA BRANCA',
+    code: 'VAB',
+    rating: 4.7,
+    color: 'from-blue-900 to-slate-800'
+  },
+  {
+    id: 'gontijo',
+    name: 'Empresa Gontijo de Transportes',
+    type: 'bus',
+    logoText: 'GONTIJO',
+    code: 'GON',
+    rating: 4.4,
+    color: 'from-yellow-600 to-amber-700'
+  },
+  {
+    id: 'guanabara',
+    name: 'Expresso Guanabara',
+    type: 'bus',
+    logoText: 'GUANABARA',
+    code: 'GNB',
+    rating: 4.5,
+    color: 'from-blue-600 to-indigo-700'
+  }
+];
+
+export const ALL_COMPANIES: Company[] = [...AIRLINES, ...BUS_COMPANIES];
