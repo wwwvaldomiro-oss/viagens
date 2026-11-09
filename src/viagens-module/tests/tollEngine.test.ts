@@ -233,3 +233,76 @@ describe('Smart Location Search: Coordinates, CEP, Landmarks & Cities', () => {
   });
 });
 
+import { isValidCoordinate } from '../components/car-planner/GoogleMapRouteDirector';
+
+describe('Route Polyline Coordinate Validation & Fuel Calculation', () => {
+  it('validates coordinates correctly for polyline drawing', () => {
+    // Valid Brazilian coordinates
+    assert.strictEqual(isValidCoordinate(-23.5505, -46.6333), true, 'São Paulo coordinates should be valid');
+    assert.strictEqual(isValidCoordinate(-22.9068, -43.1729), true, 'Rio coordinates should be valid');
+    assert.strictEqual(isValidCoordinate(-8.0476, -34.8770), true, 'Recife coordinates should be valid');
+
+    // Invalid coordinates
+    assert.strictEqual(isValidCoordinate(0, 0), false, '0,0 placeholder should be rejected');
+    assert.strictEqual(isValidCoordinate(null, null), false, 'null coordinates should be rejected');
+    assert.strictEqual(isValidCoordinate(undefined, undefined), false, 'undefined coordinates should be rejected');
+    assert.strictEqual(isValidCoordinate(NaN, -46.6333), false, 'NaN coordinates should be rejected');
+    assert.strictEqual(isValidCoordinate(-95.0, -46.6333), false, 'Out-of-range latitude should be rejected');
+    assert.strictEqual(isValidCoordinate(-23.55, 200.0), false, 'Out-of-range longitude should be rejected');
+  });
+
+  it('calculates total estimated trip cost dynamically based on Consumo Médio and Preço do Combustível', () => {
+    const spOrigin = { id: 'sp', label: 'A', name: 'São Paulo, SP', lat: -23.5505, lng: -46.6333 };
+    const rjDest = { id: 'rj', label: 'B', name: 'Rio de Janeiro, RJ', lat: -22.9068, lng: -43.1729 };
+
+    // Standard run: 12 km/l at R$ 6.09/l
+    const standardRoute = calculateRoadTripRoute({
+      origin: spOrigin,
+      destination: rjDest,
+      customKmPerLiter: 12.0,
+      customFuelPrice: 6.09
+    });
+
+    // Custom economic run: 15 km/l at R$ 5.80/l
+    const economicRoute = calculateRoadTripRoute({
+      origin: spOrigin,
+      destination: rjDest,
+      customKmPerLiter: 15.0,
+      customFuelPrice: 5.80
+    });
+
+    // Custom heavy vehicle run: 8 km/l at R$ 6.50/l
+    const heavyRoute = calculateRoadTripRoute({
+      origin: spOrigin,
+      destination: rjDest,
+      customKmPerLiter: 8.0,
+      customFuelPrice: 6.50
+    });
+
+    // Fuel liters = distance / kmPerL
+    const expectedEconLiters = Number((economicRoute.distanceKm / 15.0).toFixed(1));
+    assert.strictEqual(economicRoute.fuelLitersNeeded, expectedEconLiters);
+    
+    // Total fuel cost = liters * price
+    const expectedEconFuelCost = Number((expectedEconLiters * 5.80).toFixed(2));
+    assert.strictEqual(economicRoute.fuelTotalBRL, expectedEconFuelCost);
+
+    // Total trip cost = toll + fuel
+    assert.strictEqual(
+      economicRoute.totalTripCostBRL, 
+      Number((economicRoute.tollTotalBRL + economicRoute.fuelTotalBRL).toFixed(2))
+    );
+
+    // Economic route must cost less in fuel than heavy route
+    assert.ok(
+      economicRoute.fuelTotalBRL < standardRoute.fuelTotalBRL,
+      'Higher km/l with lower fuel price should yield lower fuel total'
+    );
+    assert.ok(
+      heavyRoute.fuelTotalBRL > standardRoute.fuelTotalBRL,
+      'Lower km/l with higher fuel price should yield higher fuel total'
+    );
+  });
+});
+
+

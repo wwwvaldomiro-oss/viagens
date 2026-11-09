@@ -11,10 +11,12 @@ import {
   Check, 
   Sparkles,
   ShieldCheck,
-  ArrowRight
+  ArrowRight,
+  ExternalLink,
+  ClipboardList
 } from 'lucide-react';
 import { Ticket } from '../types';
-import { formatCurrencyBRL, formatDuration, formatTime, formatDateBR } from '../services/ticketEngine';
+import { formatCurrencyBRL, formatDuration, formatTime } from '../services/ticketEngine';
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -42,9 +44,14 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-300 transition-all shadow-xs hover:shadow-md overflow-hidden group">
-      {/* Deal tag bar if any */}
+      {/* Deal tag bar */}
       <div className="px-5 py-1.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs flex-wrap gap-2">
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          {ticket.isInternational && (
+            <span className="font-bold text-sky-800 bg-sky-100/90 px-2 py-0.5 rounded border border-sky-300 flex items-center gap-1 text-[11px]">
+              🌐 Rota Internacional
+            </span>
+          )}
           {paymentMode === 'miles' && (
             <span className="font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 flex items-center gap-1 text-[11px]">
               <Sparkles className="w-3 h-3 text-amber-600" />
@@ -81,7 +88,7 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
           )}
         </div>
         <span className="text-[11px] text-slate-400 hidden sm:inline">
-          Fornecedor oficial: {ticket.partnerName}
+          Emissão direta no site oficial: {ticket.company.name}
         </span>
       </div>
 
@@ -107,7 +114,7 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
                     {isFlight ? (
                       <>
                         <Plane className="w-3 h-3 text-sky-600" />
-                        <span>Voo Comercial</span>
+                        <span>{ticket.isInternational ? 'Voo Internacional' : 'Voo Doméstico'}</span>
                       </>
                     ) : (
                       <>
@@ -124,17 +131,18 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
 
             {/* Baggage Tag & Loyalty Program selector */}
             <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
-              {/* Program selector for miles */}
               {(paymentMode === 'miles' || paymentMode === 'points_cash') && ticket.alternativeMilesOptions && ticket.alternativeMilesOptions.length > 0 && (
                 <select
                   value={selectedProgram}
                   onChange={(e) => setSelectedProgram(e.target.value)}
                   className="text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:ring-sky-500"
                 >
-                  <option value={ticket.milesOption.program}>{ticket.milesOption.programName}</option>
-                  {ticket.alternativeMilesOptions.map(alt => (
-                    <option key={alt.program} value={alt.program}>{alt.programName}</option>
-                  ))}
+                  <option key={`opt-primary-${ticket.id}-${ticket.milesOption.program}`} value={ticket.milesOption.program}>{ticket.milesOption.programName}</option>
+                  {ticket.alternativeMilesOptions
+                    .filter(alt => alt.program !== ticket.milesOption.program)
+                    .map(alt => (
+                      <option key={`opt-alt-${ticket.id}-${alt.program}`} value={alt.program}>{alt.programName}</option>
+                    ))}
                 </select>
               )}
 
@@ -177,7 +185,7 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
               <span className={`text-[11px] font-medium block mt-1 ${
                 ticket.stops === 0 ? 'text-emerald-600' : 'text-amber-600'
               }`}>
-                {ticket.stops === 0 ? 'Direto' : `${ticket.stops} parada`}
+                {ticket.stops === 0 ? 'Voo Direto' : `${ticket.stops} conexão`}
               </span>
             </div>
 
@@ -199,86 +207,139 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
         {/* Vertical Divider on Desktop */}
         <div className="hidden lg:block w-px self-stretch bg-slate-100" />
 
-        {/* Right: Pricing & CTA */}
-        <div className="flex flex-col sm:flex-row lg:flex-col items-end justify-between lg:justify-center gap-3 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-100 min-w-[210px]">
-          <div className="text-left sm:text-right lg:text-right w-full">
-            {paymentMode === 'miles' ? (
-              /* Miles Display */
-              <div>
-                <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">
-                  {activeMilesOption.programName}
+        {/* Right: Pricing & Direct Emission Link */}
+        <div className="w-full lg:w-72 flex flex-col justify-between gap-3 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+          <div className="w-full space-y-2">
+            {/* 1. Tarifa comercial extraída */}
+            <div className="bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/80">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  {paymentMode === 'miles' ? 'Tarifa Comercial Extraída:' : 'Preço Oficial:'}
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers tracking-tight">
-                  {new Intl.NumberFormat('pt-BR').format(activeMilesOption.points)}{' '}
-                  <span className="text-base font-bold text-slate-500">pts</span>
-                </div>
-                <p className="text-xs text-slate-600 font-mono-numbers mt-0.5">
-                  {activeMilesOption.taxBRL > 0 ? (
-                    <>+ {formatCurrencyBRL(activeMilesOption.taxBRL)} taxas</>
-                  ) : (
-                    <span className="text-emerald-600 font-medium">Taxa R$ 0,00</span>
-                  )}
-                </p>
-                <span className="text-[11px] text-slate-400 block mt-1">
-                  Valor em dinheiro: {formatCurrencyBRL(ticket.price)}
-                </span>
-              </div>
-            ) : paymentMode === 'points_cash' ? (
-              /* Points + Cash Display */
-              <div>
-                <span className="text-[11px] font-semibold text-indigo-700 uppercase tracking-wider block">
-                  {activeMilesOption.programName} + R$
-                </span>
-                <div className="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono-numbers tracking-tight">
-                  {new Intl.NumberFormat('pt-BR').format(activeMilesOption.cashOption?.reducedPoints || Math.round(activeMilesOption.points * 0.5))} pts
-                </div>
-                <p className="text-xs font-bold text-indigo-700 font-mono-numbers mt-0.5">
-                  + {formatCurrencyBRL(activeMilesOption.cashOption?.cashAmount || Math.round(ticket.price * 0.5))}
-                </p>
-                <span className="text-[11px] text-slate-400 block mt-1">
-                  Economize {formatCurrencyBRL(ticket.price - (activeMilesOption.cashOption?.cashAmount || 0))}
-                </span>
-              </div>
-            ) : (
-              /* Regular Money Display */
-              <div>
                 {ticket.originalPrice && (
-                  <span className="text-xs text-slate-400 line-through font-mono-numbers block">
+                  <span className="text-[11px] text-slate-400 line-through font-mono-numbers">
                     {formatCurrencyBRL(ticket.originalPrice)}
                   </span>
                 )}
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers tracking-tight">
-                  {formatCurrencyBRL(ticket.price)}
-                </div>
-                <p className="text-xs text-slate-500 font-mono-numbers mt-0.5">
-                  em até {ticket.installments.count}x de {formatCurrencyBRL(ticket.installments.value)} s/ juros
-                </p>
-                <div className="mt-1 flex items-center justify-end gap-1 text-[11px] text-amber-700">
-                  <span>ou <b>{new Intl.NumberFormat('pt-BR').format(activeMilesOption.points)} pts</b> ({activeMilesOption.programName})</span>
-                </div>
               </div>
-            )}
+              <div className="text-2xl font-extrabold text-slate-900 font-mono-numbers tracking-tight mt-0.5">
+                {formatCurrencyBRL(ticket.price)}
+              </div>
+              <p className="text-[10px] text-slate-500 font-mono-numbers mt-0.5">
+                em até {ticket.installments.count}x de {formatCurrencyBRL(ticket.installments.value)} sem juros
+              </p>
+            </div>
 
-            <span className="text-[11px] text-emerald-600 font-medium block mt-1">
-              {ticket.seatsAvailable} {ticket.seatsAvailable === 1 ? 'assento restante' : 'assentos restantes'}
-            </span>
+            {/* 2. Pontos necessários informados abaixo do valor */}
+            <div className={`p-2.5 rounded-xl border text-left transition-all ${
+              paymentMode === 'miles'
+                ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-400/50 shadow-xs'
+                : 'bg-amber-50/60 border-amber-200/80 hover:border-amber-300'
+            }`}>
+              <div className="flex items-center justify-between gap-1 mb-1">
+                <span className="text-[10px] font-extrabold text-amber-950 flex items-center gap-1 uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-amber-600 shrink-0" />
+                  <span>Pontos Necessários:</span>
+                </span>
+                <span className="text-[10px] font-bold text-amber-800 bg-amber-100/90 px-1.5 py-0.5 rounded">
+                  {activeMilesOption.programName}
+                </span>
+              </div>
+
+              <div className="text-xl font-black text-amber-950 font-mono-numbers tracking-tight">
+                {new Intl.NumberFormat('pt-BR').format(activeMilesOption.points)}{' '}
+                <span className="text-xs font-bold text-amber-700">pts / milhas</span>
+              </div>
+
+              <div className="text-[10px] text-slate-600 font-mono-numbers flex items-center justify-between mt-1 pt-1 border-t border-amber-200/50">
+                <span>
+                  {activeMilesOption.taxBRL > 0 ? (
+                    <>+ {formatCurrencyBRL(activeMilesOption.taxBRL)} taxa</>
+                  ) : (
+                    <span className="text-emerald-700 font-medium">Taxa R$ 0,00</span>
+                  )}
+                </span>
+                <span className={`font-semibold px-1 py-0.2 rounded text-[9px] ${
+                  activeMilesOption.isGoodDeal ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
+                }`}>
+                  CPM: {formatCurrencyBRL(activeMilesOption.cpmValueBRL)}/k
+                </span>
+              </div>
+
+              {/* Quick Loyalty Program Selector Chips */}
+              <div className="flex items-center gap-1 mt-1.5 pt-1.5 border-t border-amber-200/60 flex-wrap">
+                <span className="text-[9px] font-bold text-amber-900 uppercase mr-0.5">Programas:</span>
+                {(() => {
+                  const seen = new Set<string>();
+                  const uniqueProgs = [ticket.milesOption, ...(ticket.alternativeMilesOptions || [])].filter(p => {
+                    if (seen.has(p.program)) return false;
+                    seen.add(p.program);
+                    return true;
+                  });
+                  return uniqueProgs.slice(0, 4).map(prog => (
+                    <button
+                      key={`chip-${ticket.id}-${prog.program}`}
+                      type="button"
+                      onClick={() => setSelectedProgram(prog.program)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                        selectedProgram === prog.program
+                          ? 'bg-amber-600 text-white shadow-2xs'
+                          : 'bg-white text-slate-700 border border-amber-200/70 hover:bg-amber-100'
+                      }`}
+                    >
+                      {prog.programName.split(' ')[0]}: {Math.round(prog.points / 1000)}k
+                    </button>
+                  ));
+                })()}
+              </div>
+            </div>
+
+            {/* Seat Availability & Verified Source */}
+            <div className="flex items-center justify-between text-[11px] pt-0.5 gap-2">
+              <span className="text-emerald-600 font-medium text-[10px] shrink-0">
+                {ticket.seatsAvailable} assentos na classe tarifária
+              </span>
+              <span className="text-slate-400 font-mono-numbers text-[10px] truncate text-right">
+                {ticket.verifiedSource?.providerName.split('·')[0].trim() || 'Fonte Oficial'}
+              </span>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2 w-full">
+          {/* Action Buttons: Direct Emission Link + Consultation Details */}
+          <div className="flex flex-col gap-2 w-full mt-1">
+            {/* Primary Action: Direct Redirection to Carrier for Emission (No fake sale) */}
+            <a
+              href={ticket.offerEmissionUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer text-center"
+            >
+              <span>
+                {paymentMode === 'miles' 
+                  ? `Ir para Emissão com Milhas ↗` 
+                  : paymentMode === 'points_cash'
+                  ? `Ir para Emissão (Pontos + R$) ↗`
+                  : `Ir para Emissão Oficial (${ticket.company.name}) ↗`}
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+            </a>
+
+            {/* Secondary Action: Consultation & Trip Planning Modal */}
             <button
               type="button"
               onClick={() => onSelect(ticket)}
-              className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs hover:shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+              className="w-full py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
-              <span>{paymentMode === 'miles' ? 'Emitir com Milhas' : paymentMode === 'points_cash' ? 'Emitir Pontos + R$' : 'Ver Oferta'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ClipboardList className="w-3.5 h-3.5 text-slate-500" />
+              <span>Ficha de Consulta & Programação</span>
             </button>
+
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1 py-1"
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1 py-0.5 cursor-pointer"
             >
-              <span>{isExpanded ? 'Ocultar detalhes' : 'Ver itinerário & milhas'}</span>
+              <span>{isExpanded ? 'Ocultar detalhes' : 'Ver tabela de resgate & milhas'}</span>
               {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
           </div>
@@ -337,8 +398,7 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
               Tabela Comparativa de Resgate por Milhas & Programas de Recompensa
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {/* Primary program */}
-              <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+              <div key={`primary-drawer-${ticket.id}`} className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-900 text-xs">{ticket.milesOption.programName}</span>
                   <span className="text-[10px] text-amber-700 font-semibold bg-amber-50 px-1.5 py-0.5 rounded">
@@ -354,9 +414,10 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
                 </div>
               </div>
 
-              {/* Alternative programs */}
-              {ticket.alternativeMilesOptions?.map((alt) => (
-                <div key={alt.program} className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
+              {ticket.alternativeMilesOptions
+                ?.filter(alt => alt.program !== ticket.milesOption.program)
+                .map((alt) => (
+                <div key={`alt-drawer-${ticket.id}-${alt.program}`} className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-slate-900 text-xs">{alt.programName}</span>
                     <span className="text-[10px] text-slate-500 font-medium">
@@ -379,7 +440,7 @@ export function TicketCard({ ticket, paymentMode = 'money', onSelect }: TicketCa
           </div>
 
           <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
-            <span>Cancelamento gratuito garantido por lei até 24h após a compra</span>
+            <span>Redirecionamento oficial direto para emissão no fornecedor {ticket.company.name}</span>
             <span>Tarifa confirmada em tempo real com {ticket.partnerName}</span>
           </div>
         </div>

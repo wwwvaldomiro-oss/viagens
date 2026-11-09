@@ -556,6 +556,297 @@ export const POPULAR_LOCATIONS: Location[] = [
   }
 ];
 
+export const INTERNATIONAL_LOCATIONS: Location[] = [
+  // Estados Unidos & América do Norte
+  {
+    id: 'mia',
+    name: 'Aeroporto Internacional de Miami (MIA)',
+    city: 'Miami',
+    state: 'FL',
+    code: 'MIA',
+    type: 'airport',
+    country: 'Estados Unidos'
+  },
+  {
+    id: 'mco',
+    name: 'Aeroporto Internacional de Orlando (MCO)',
+    city: 'Orlando',
+    state: 'FL',
+    code: 'MCO',
+    type: 'airport',
+    country: 'Estados Unidos'
+  },
+  {
+    id: 'jfk',
+    name: 'Aeroporto Internacional John F. Kennedy (JFK)',
+    city: 'Nova York',
+    state: 'NY',
+    code: 'JFK',
+    type: 'airport',
+    country: 'Estados Unidos'
+  },
+  {
+    id: 'ewr',
+    name: 'Aeroporto Internacional de Newark Liberty (EWR)',
+    city: 'Nova York / Newark',
+    state: 'NJ',
+    code: 'EWR',
+    type: 'airport',
+    country: 'Estados Unidos'
+  },
+  {
+    id: 'nyc-all',
+    name: 'Nova York (Todos os Aeroportos - JFK, EWR, LGA)',
+    city: 'Nova York',
+    state: 'NY',
+    code: 'NYC',
+    type: 'city_all',
+    country: 'Estados Unidos'
+  },
+  {
+    id: 'lax',
+    name: 'Aeroporto Internacional de Los Angeles (LAX)',
+    city: 'Los Angeles',
+    state: 'CA',
+    code: 'LAX',
+    type: 'airport',
+    country: 'Estados Unidos'
+  },
+  {
+    id: 'ord',
+    name: 'Aeroporto Internacional O\'Hare (ORD)',
+    city: 'Chicago',
+    state: 'IL',
+    code: 'ORD',
+    type: 'airport',
+    country: 'Estados Unidos'
+  },
+  {
+    id: 'cun',
+    name: 'Aeroporto Internacional de Cancún (CUN)',
+    city: 'Cancún',
+    state: 'Q.R.',
+    code: 'CUN',
+    type: 'airport',
+    country: 'México'
+  },
+
+  // Europa
+  {
+    id: 'lis',
+    name: 'Aeroporto Humberto Delgado (Lisboa - LIS)',
+    city: 'Lisboa',
+    state: 'LIS',
+    code: 'LIS',
+    type: 'airport',
+    country: 'Portugal'
+  },
+  {
+    id: 'opo',
+    name: 'Aeroporto Francisco Sá Carneiro (Porto - OPO)',
+    city: 'Porto',
+    state: 'OPO',
+    code: 'OPO',
+    type: 'airport',
+    country: 'Portugal'
+  },
+  {
+    id: 'mad',
+    name: 'Aeroporto Adolfo Suárez Madrid-Barajas (MAD)',
+    city: 'Madri',
+    state: 'MAD',
+    code: 'MAD',
+    type: 'airport',
+    country: 'Espanha'
+  },
+  {
+    id: 'bcn',
+    name: 'Aeroporto Josep Tarradellas Barcelona-El Prat (BCN)',
+    city: 'Barcelona',
+    state: 'CAT',
+    code: 'BCN',
+    type: 'airport',
+    country: 'Espanha'
+  },
+  {
+    id: 'cdg',
+    name: 'Aeroporto de Paris-Charles de Gaulle (CDG)',
+    city: 'Paris',
+    state: 'IDF',
+    code: 'CDG',
+    type: 'airport',
+    country: 'França'
+  },
+  {
+    id: 'par-all',
+    name: 'Paris (Todos os Aeroportos - CDG e Orly)',
+    city: 'Paris',
+    state: 'IDF',
+    code: 'PAR',
+    type: 'city_all',
+    country: 'França'
+  },
+  {
+    id: 'lhr',
+    name: 'Aeroporto de Londres-Heathrow (LHR)',
+    city: 'Londres',
+    state: 'ENG',
+    code: 'LHR',
+    type: 'airport',
+    country: 'Reino Unido'
+  },
+  {
+    id: 'lon-all',
+    name: 'Londres (Todos os Aeroportos - LHR, LGW)',
+    city: 'Londres',
+    state: 'ENG',
+    code: 'LON',
+    type: 'city_all',
+    country: 'Reino Unido'
+  },
+  {
+    id: 'fco',
+    name: 'Aeroporto Internacional Leonardo da Vinci (Roma - FCO)',
+    city: 'Roma',
+    state: 'LAZ',
+    code: 'FCO',
+    type: 'airport',
+    country: 'Itália'
+  },
+  {
+    id: 'mxp',
+    name: 'Aeroporto de Milão-Malpensa (MXP)',
+    city: 'Milão',
+    state: 'LOM',
+    code: 'MXP',
+    type: 'airport',
+    country: 'Itália'
+  },
+  {
+    id: 'fra',
+    name: 'Aeroporto de Frankfurt am Main (FRA)',
+    city: 'Frankfurt',
+    state: 'HES',
+    code: 'FRA',
+    type: 'airport',
+    country: 'Alemanha'
+  },
+  {
+    id: 'ams',
+    name: 'Aeroporto de Amsterdã Schiphol (AMS)',
+    city: 'Amsterdã',
+    state: 'NH',
+    code: 'AMS',
+    type: 'airport',
+    country: 'Holanda'
+  },
+
+  // América do Sul
+  {
+    id: 'eze',
+    name: 'Aeroporto Internacional Ministro Pistarini (Ezeiza - EZE)',
+    city: 'Buenos Aires',
+    state: 'BA',
+    code: 'EZE',
+    type: 'airport',
+    country: 'Argentina'
+  },
+  {
+    id: 'aep',
+    name: 'Aeroparque Jorge Newbery (AEP)',
+    city: 'Buenos Aires',
+    state: 'BA',
+    code: 'AEP',
+    type: 'airport',
+    country: 'Argentina'
+  },
+  {
+    id: 'bue-all',
+    name: 'Buenos Aires (Todos os Aeroportos - EZE & AEP)',
+    city: 'Buenos Aires',
+    state: 'BA',
+    code: 'BUE',
+    type: 'city_all',
+    country: 'Argentina'
+  },
+  {
+    id: 'scl',
+    name: 'Aeroporto Internacional Arturo Merino Benítez (SCL)',
+    city: 'Santiago',
+    state: 'RM',
+    code: 'SCL',
+    type: 'airport',
+    country: 'Chile'
+  },
+  {
+    id: 'mvd',
+    name: 'Aeroporto Internacional de Carrasco (MVD)',
+    city: 'Montevidéu',
+    state: 'MO',
+    code: 'MVD',
+    type: 'airport',
+    country: 'Uruguai'
+  },
+  {
+    id: 'lim',
+    name: 'Aeroporto Internacional Jorge Chávez (LIM)',
+    city: 'Lima',
+    state: 'LIM',
+    code: 'LIM',
+    type: 'airport',
+    country: 'Peru'
+  },
+  {
+    id: 'bog',
+    name: 'Aeroporto Internacional El Dorado (BOG)',
+    city: 'Bogotá',
+    state: 'BOG',
+    code: 'BOG',
+    type: 'airport',
+    country: 'Colômbia'
+  },
+
+  // Oriente Médio & Ásia
+  {
+    id: 'dxb',
+    name: 'Aeroporto Internacional de Dubai (DXB)',
+    city: 'Dubai',
+    state: 'DXB',
+    code: 'DXB',
+    type: 'airport',
+    country: 'Emirados Árabes'
+  },
+  {
+    id: 'doh',
+    name: 'Aeroporto Internacional de Hamad (DOH)',
+    city: 'Doha',
+    state: 'DOH',
+    code: 'DOH',
+    type: 'airport',
+    country: 'Catar'
+  },
+  {
+    id: 'hnd',
+    name: 'Aeroporto Internacional de Tóquio Haneda (HND)',
+    city: 'Tóquio',
+    state: 'TYO',
+    code: 'HND',
+    type: 'airport',
+    country: 'Japão'
+  },
+  {
+    id: 'nrt',
+    name: 'Aeroporto Internacional de Narita (NRT)',
+    city: 'Tóquio',
+    state: 'TYO',
+    code: 'NRT',
+    type: 'airport',
+    country: 'Japão'
+  }
+];
+
+export const ALL_LOCATIONS: Location[] = [...POPULAR_LOCATIONS, ...INTERNATIONAL_LOCATIONS];
+
 export function normalizeSearchText(str: string): string {
   return str
     .toLowerCase()
@@ -564,21 +855,38 @@ export function normalizeSearchText(str: string): string {
     .trim();
 }
 
+// Multilingual and synonym aliases (e.g. "New York" -> "Nova York", "Lisbon" -> "Lisboa")
+const CITY_SYNONYMS: Record<string, string[]> = {
+  'nova york': ['new york', 'nyc', 'manhattan', 'eua', 'usa'],
+  'lisboa': ['lisbon', 'portugal'],
+  'madri': ['madrid', 'spain', 'espanha'],
+  'londres': ['london', 'england', 'uk', 'reino unido'],
+  'paris': ['france', 'franca'],
+  'roma': ['rome', 'italia', 'italy'],
+  'milao': ['milan', 'italia'],
+  'buenos aires': ['argentina', 'baires'],
+  'santiago': ['chile'],
+  'orlando': ['disney', 'florida', 'usa', 'eua'],
+  'miami': ['florida', 'south beach', 'usa', 'eua'],
+  'toquio': ['tokyo', 'japan', 'japao'],
+  'cancun': ['mexico', 'caribe']
+};
+
 export function searchLocations(query: string, filterType?: 'airport' | 'bus_station' | 'all'): Location[] {
   const normalized = normalizeSearchText(query);
   
   if (!normalized) {
     if (filterType === 'airport') {
-      return POPULAR_LOCATIONS.filter(l => l.type === 'airport').slice(0, 10);
+      return ALL_LOCATIONS.filter(l => l.type === 'airport').slice(0, 12);
     }
     if (filterType === 'bus_station') {
-      return POPULAR_LOCATIONS.filter(l => l.type === 'bus_station').slice(0, 10);
+      return ALL_LOCATIONS.filter(l => l.type === 'bus_station').slice(0, 10);
     }
-    return POPULAR_LOCATIONS.slice(0, 10);
+    return ALL_LOCATIONS.slice(0, 12);
   }
 
-  // Filter matching candidates
-  const matching = POPULAR_LOCATIONS.filter(loc => {
+  // Filter matching candidates from all locations (domestic + international)
+  const matching = ALL_LOCATIONS.filter(loc => {
     if (filterType === 'bus_station' && loc.type !== 'bus_station') return false;
     if (filterType === 'airport' && loc.type !== 'airport' && loc.type !== 'city_all') return false;
 
@@ -586,13 +894,29 @@ export function searchLocations(query: string, filterType?: 'airport' | 'bus_sta
     const normCity = normalizeSearchText(loc.city);
     const normState = normalizeSearchText(loc.state);
     const normCode = normalizeSearchText(loc.code);
+    const normCountry = normalizeSearchText(loc.country || '');
 
-    return (
+    // Check direct properties
+    const directMatch = (
       normName.includes(normalized) ||
       normCity.includes(normalized) ||
       normState.includes(normalized) ||
-      normCode.includes(normalized)
+      normCode.includes(normalized) ||
+      normCountry.includes(normalized)
     );
+
+    if (directMatch) return true;
+
+    // Check synonyms
+    for (const [keyCity, synonyms] of Object.entries(CITY_SYNONYMS)) {
+      if (normCity.includes(keyCity)) {
+        if (synonyms.some(syn => syn.includes(normalized) || normalized.includes(syn))) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   });
 
   // Relevance ranking
@@ -602,7 +926,7 @@ export function searchLocations(query: string, filterType?: 'airport' | 'bus_sta
     const aNormCode = normalizeSearchText(a.code);
     const bNormCode = normalizeSearchText(b.code);
 
-    // 1. Exact code match (e.g. GRU, RIO, SAO, BSB)
+    // 1. Exact code match (e.g. MIA, JFK, LIS, GRU, RIO, SAO, BSB)
     const aExactCode = aNormCode === normalized ? 1 : 0;
     const bExactCode = bNormCode === normalized ? 1 : 0;
     if (aExactCode !== bExactCode) return bExactCode - aExactCode;

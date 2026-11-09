@@ -14,19 +14,26 @@ import { SearchQuery, Location, TransportType, TripType } from '../types';
 import { LocationPickerModal } from './LocationPickerModal';
 import { LocationAutocompleteInput } from './LocationAutocompleteInput';
 import { formatDateBR } from '../services/ticketEngine';
+import { PaymentMode } from '../types';
 
 interface SearchBarProps {
   query: SearchQuery;
   onSearch: (updatedQuery: SearchQuery) => void;
   onOpenPriceCalendar: () => void;
   onOpenPriceAlert: () => void;
+  paymentMode?: PaymentMode;
+  onPaymentModeChange?: (mode: PaymentMode) => void;
+  onOpenCarPlatform?: () => void;
 }
 
 export function SearchBar({
   query,
   onSearch,
   onOpenPriceCalendar,
-  onOpenPriceAlert
+  onOpenPriceAlert,
+  paymentMode = 'money',
+  onPaymentModeChange,
+  onOpenCarPlatform
 }: SearchBarProps) {
   const [localQuery, setLocalQuery] = useState<SearchQuery>(query);
   const [activePicker, setActivePicker] = useState<'origin' | 'destination' | null>(null);
@@ -62,58 +69,111 @@ export function SearchBar({
 
   return (
     <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-5 md:p-6 transition-all">
+      {/* 0. Forma de Emissão - Dinheiro vs Milhas vs Pontos + R$ */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 mb-3.5 border-b border-slate-100">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+            FORMA DE EMISSÃO
+          </span>
+          <div className="inline-flex items-center p-1 bg-slate-100 rounded-xl">
+            <button
+              type="button"
+              onClick={() => onPaymentModeChange && onPaymentModeChange('money')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                paymentMode === 'money'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Dinheiro (R$)
+            </button>
+            <button
+              type="button"
+              onClick={() => onPaymentModeChange && onPaymentModeChange('miles')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                paymentMode === 'miles'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Milhas / Pts
+            </button>
+            <button
+              type="button"
+              onClick={() => onPaymentModeChange && onPaymentModeChange('points_cash')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                paymentMode === 'points_cash'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Pontos + R$
+            </button>
+          </div>
+        </div>
+
+        {/* Real-time verified feed indicator */}
+        <div className="flex items-center gap-2 text-[11px] text-slate-600 bg-emerald-50/80 border border-emerald-200/70 px-2.5 py-1 rounded-lg">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
+          <span className="font-semibold text-emerald-800">
+            Preços Reais: GDS LATAM · GOL Sabre · Azul · ANTT
+          </span>
+        </div>
+      </div>
+
       {/* Top Controls: Transport Type + Trip Type + Tools */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
-        {/* Transport Type Segmented Control */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl">
-          <button
-            type="button"
-            onClick={() => handleTransportChange('all')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all ${
-              localQuery.transportType === 'all'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <span>Todos os Transportes</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleTransportChange('flight')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all ${
-              localQuery.transportType === 'flight'
-                ? 'bg-white text-sky-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Plane className="w-3.5 h-3.5" />
-            <span>Voos</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleTransportChange('bus')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all ${
-              localQuery.transportType === 'bus'
-                ? 'bg-white text-blue-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Bus className="w-3.5 h-3.5" />
-            <span>Ônibus</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleTransportChange('car')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all ${
-              localQuery.transportType === 'car'
-                ? 'bg-white text-orange-700 shadow-xs ring-1 ring-orange-500/30'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Car className="w-3.5 h-3.5 text-orange-600" />
-            <span>Carros</span>
-            <span className="text-[9px] bg-orange-100 text-orange-700 font-extrabold px-1 rounded">ESTRADA</span>
-          </button>
+        {/* Transport Type Segmented Control (Voos & Ônibus) + Acesso à Plataforma de Carro */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl">
+            <button
+              type="button"
+              onClick={() => handleTransportChange('all')}
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                localQuery.transportType === 'all'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Todos (Voos & Ônibus)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTransportChange('flight')}
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                localQuery.transportType === 'flight'
+                  ? 'bg-white text-sky-700 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Plane className="w-3.5 h-3.5" />
+              <span>Voos</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTransportChange('bus')}
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                localQuery.transportType === 'bus'
+                  ? 'bg-white text-blue-700 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Bus className="w-3.5 h-3.5" />
+              <span>Ônibus</span>
+            </button>
+          </div>
+
+          {onOpenCarPlatform && (
+            <button
+              type="button"
+              onClick={onOpenCarPlatform}
+              className="text-xs font-bold text-orange-700 bg-orange-50 hover:bg-orange-100/80 active:bg-orange-200/80 border border-orange-200/80 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+              title="Abrir plataforma independente de rotas, pedágios e postos da PRF"
+            >
+              <Car className="w-3.5 h-3.5 text-orange-600" />
+              <span>Viajar de Carro (Plataforma Rodoviária) ➔</span>
+            </button>
+          )}
         </div>
 
         {/* Trip Type & Skyscanner Shortcuts */}

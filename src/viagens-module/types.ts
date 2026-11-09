@@ -18,6 +18,7 @@ export interface Location {
   code: string; // IATA (e.g. GRU) or Terminal Code (e.g. TIETE)
   type: 'airport' | 'bus_station' | 'city_all';
   country: string;
+  coordinates?: { lat: number; lng: number };
 }
 
 export interface Company {
@@ -98,6 +99,14 @@ export interface Ticket {
   // Loyalty, Miles & Points
   milesOption: MilesOption;
   alternativeMilesOptions?: MilesOption[];
+  verifiedSource?: {
+    providerName: string;
+    reliability: string;
+    syncMinutesAgo: number;
+    officialTicketType: string;
+  };
+  offerEmissionUrl: string;
+  isInternational?: boolean;
 }
 
 export interface SearchQuery {
@@ -158,4 +167,5 @@ export interface ViagensModuleProps {
     userPoints?: number;
     loyaltyPrograms?: { id: string; name: string; balance: number }[];
   };
+  onOpenCarPlatform?: () => void;
 }

@@ -350,14 +350,14 @@ export function CarRoadTripPlanner({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold tracking-wider text-orange-400 uppercase">
-                  Módulo VIAGENS · Estrada & Rodovias
+                  RODOVIAS & PEDÁGIOS BRASIL
                 </span>
-                <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono border border-slate-700">
-                  Rotas & Pedágios
+                <span className="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded font-mono border border-emerald-800/80">
+                  Plataforma Independente
                 </span>
               </div>
               <h1 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-1.5">
-                <span>Calculadora de Rota, Pedágios, Postos PRF e Combustível</span>
+                <span>Roteirizador de Estradas, Praças de Pedágio, Postos PRF e Combustível</span>
               </h1>
             </div>
           </div>
@@ -369,23 +369,31 @@ export function CarRoadTripPlanner({
               <button
                 key={idx}
                 onClick={() => applyPresetRoute(p)}
-                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 rounded-lg text-[11px] font-semibold transition-colors shrink-0 border border-slate-700/60"
+                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 rounded-lg text-[11px] font-semibold transition-colors shrink-0 border border-slate-700/60 cursor-pointer"
               >
                 {p.name}
               </button>
             ))}
           </div>
 
-          {/* Right Action: Return to Flights & Buses */}
+          {/* Right Actions: Enviar p/ GPS + Compartilhar Rota */}
           <div className="flex items-center gap-2">
-            {onBackToTickets && (
-              <button
-                onClick={onBackToTickets}
-                className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border border-slate-700"
-              >
-                <span>← Voltar para Voos & Ônibus</span>
-              </button>
-            )}
+            <button
+              onClick={() => setIsGpsModalOpen(true)}
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+              title="Exportar rota para Waze ou Google Maps no celular"
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              <span>Enviar p/ GPS</span>
+            </button>
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border border-slate-700 cursor-pointer"
+              title="Compartilhar itinerário com motorista via WhatsApp"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Compartilhar</span>
+            </button>
           </div>
         </div>
       </header>
@@ -508,21 +516,27 @@ export function CarRoadTripPlanner({
             </div>
 
             {/* 2. Vehicle Category & Fuel Configuration */}
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/90 space-y-3">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                <Car className="w-3.5 h-3.5 text-orange-600" />
-                Configuração do Veículo & Combustível
-              </span>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/90 space-y-3.5 shadow-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <Fuel className="w-3.5 h-3.5 text-orange-600" />
+                  Consumo, Combustível & Custos
+                </span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                  Cálculo Dinâmico
+                </span>
+              </div>
 
               {/* Vehicle Dropdown */}
               <div>
-                <label className="text-[11px] font-semibold text-slate-600 mb-1 block">
-                  Categoria do Veículo (Tarifa por Eixos):
+                <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Categoria do Veículo (Tarifa por Eixos):</span>
+                  <span className="text-[10px] text-slate-500 font-normal">Ajusta pedágio e consumo</span>
                 </label>
                 <select
                   value={selectedVehicle}
                   onChange={(e) => handleVehicleChange(e.target.value as VehicleCategoryId)}
-                  className="w-full text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-hidden"
+                  className="w-full text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-hidden shadow-xs cursor-pointer"
                 >
                   {VEHICLE_CATEGORIES.map(v => (
                     <option key={v.id} value={v.id}>
@@ -532,73 +546,183 @@ export function CarRoadTripPlanner({
                 </select>
               </div>
 
-              {/* Fuel Type & Km/L in two columns */}
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-600 mb-1 block">
-                    Combustível:
-                  </label>
-                  <select
-                    value={selectedFuel}
-                    onChange={(e) => handleFuelChange(e.target.value as FuelTypeId)}
-                    className="w-full text-xs font-semibold text-slate-900 bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-orange-500 focus:outline-hidden"
-                  >
-                    {FUEL_OPTIONS.map(f => (
-                      <option key={f.id} value={f.id}>
-                        {f.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-600 mb-1 block">
-                    Preço por {FUEL_OPTIONS.find(f => f.id === selectedFuel)?.unit}:
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">R$</span>
+              {/* Fuel Inputs Grid: Consumo Médio (km/l) & Preço do Combustível (R$/l) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Field 1: Consumo Médio (km/l) */}
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-extrabold text-slate-800 flex items-center gap-1">
+                      <Fuel className="w-3 h-3 text-orange-500" />
+                      <span>Consumo Médio (km/l)</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-slate-500 font-semibold">
+                      {customKmPerL.toFixed(1)} km/l
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setCustomKmPerL(v => Math.max(1, Number((v - 0.5).toFixed(1))))}
+                      className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-black text-sm flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                      title="Diminuir consumo"
+                    >
+                      -
+                    </button>
                     <input
                       type="number"
-                      step="0.05"
-                      value={customFuelPrice}
-                      onChange={(e) => setCustomFuelPrice(Number(e.target.value))}
-                      className="w-full text-xs font-semibold text-slate-900 bg-white border border-slate-300 rounded-xl pl-8 pr-2.5 py-1.5 focus:ring-2 focus:ring-orange-500 focus:outline-hidden"
+                      step="0.1"
+                      min="1"
+                      max="60"
+                      value={customKmPerL}
+                      onChange={(e) => setCustomKmPerL(Math.max(0.5, Number(e.target.value) || 1))}
+                      className="flex-1 text-center text-xs font-black text-slate-900 bg-slate-50 border border-slate-200 rounded-lg py-1.5 focus:ring-2 focus:ring-orange-500 focus:outline-hidden"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setCustomKmPerL(v => Math.min(60, Number((v + 0.5).toFixed(1))))}
+                      className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-black text-sm flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                      title="Aumentar consumo"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Quick consumption presets */}
+                  <div className="flex items-center gap-1 mt-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setCustomKmPerL(14.0)}
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-bold transition-colors cursor-pointer ${
+                        customKmPerL === 14.0 ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      14 km/l (Econômico)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCustomKmPerL(11.5)}
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-bold transition-colors cursor-pointer ${
+                        customKmPerL === 11.5 ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      11.5 km/l (Médio)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCustomKmPerL(8.0)}
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-bold transition-colors cursor-pointer ${
+                        customKmPerL === 8.0 ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      8 km/l (SUV)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Field 2: Preço do Combustível (R$/l) */}
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-extrabold text-slate-800 flex items-center gap-1">
+                      <DollarSign className="w-3 h-3 text-emerald-600" />
+                      <span>Preço do Combustível (R$/l)</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-emerald-700 font-bold">
+                      R$ {customFuelPrice.toFixed(2)}/l
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setCustomFuelPrice(v => Math.max(0.5, Number((v - 0.10).toFixed(2))))}
+                      className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-black text-sm flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                      title="Diminuir preço"
+                    >
+                      -
+                    </button>
+                    <div className="flex-1 relative flex items-center">
+                      <span className="absolute left-2.5 text-xs text-slate-400 font-bold">R$</span>
+                      <input
+                        type="number"
+                        step="0.05"
+                        min="0.5"
+                        value={customFuelPrice}
+                        onChange={(e) => setCustomFuelPrice(Math.max(0.1, Number(e.target.value) || 1))}
+                        className="w-full text-center text-xs font-black text-slate-900 bg-slate-50 border border-slate-200 rounded-lg pl-6 pr-2 py-1.5 focus:ring-2 focus:ring-orange-500 focus:outline-hidden"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCustomFuelPrice(v => Number((v + 0.10).toFixed(2)))}
+                      className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-black text-sm flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                      title="Aumentar preço"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Fuel Options Quick Selection */}
+                  <div className="flex items-center gap-1 mt-2 flex-wrap">
+                    {FUEL_OPTIONS.map(f => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => handleFuelChange(f.id)}
+                        className={`text-[9px] px-1.5 py-0.5 rounded font-bold transition-colors cursor-pointer ${
+                          selectedFuel === f.id ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {f.name.split(' ')[0]} (R$ {f.defaultPriceBRL.toFixed(2)})
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* Consumption km/l */}
-              <div className="grid grid-cols-2 gap-2.5 pt-1">
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-600 mb-1 block">
-                    Consumo Médio (km/l):
-                  </label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={customKmPerL}
-                    onChange={(e) => setCustomKmPerL(Number(e.target.value))}
-                    className="w-full text-xs font-semibold text-slate-900 bg-white border border-slate-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-orange-500 focus:outline-hidden"
-                  />
+              {/* Live Calculation Formula Card */}
+              <div className="bg-orange-50/70 border border-orange-200/80 rounded-xl p-2.5 text-[11px] text-orange-950 space-y-1">
+                <div className="flex items-center justify-between font-bold text-orange-900">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-orange-600" />
+                    <span>Memória de Cálculo da Rota:</span>
+                  </span>
+                  <span className="font-mono text-xs">
+                    {calculatedRoute.distanceKm} km
+                  </span>
                 </div>
+                <div className="text-[10px] text-slate-700 flex flex-wrap items-center justify-between gap-1 pt-0.5">
+                  <span>
+                    <strong>Litros:</strong> {calculatedRoute.distanceKm} km ÷ {customKmPerL.toFixed(1)} km/l = <strong>{calculatedRoute.fuelLitersNeeded} L</strong>
+                  </span>
+                  <span>
+                    <strong>Combustível:</strong> {calculatedRoute.fuelLitersNeeded} L × R$ {customFuelPrice.toFixed(2)} = <strong className="text-orange-700">R$ {calculatedRoute.fuelTotalBRL.toFixed(2).replace('.', ',')}</strong>
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-700 flex items-center justify-between pt-0.5 border-t border-orange-200/60">
+                  <span><strong>Pedágios ({calculatedRoute.tollPlazasCount} praças):</strong> R$ {calculatedRoute.tollTotalBRL.toFixed(2).replace('.', ',')}</span>
+                  <span className="text-emerald-800 font-extrabold text-[11px]">
+                    Total: R$ {calculatedRoute.totalTripCostBRL.toFixed(2).replace('.', ',')}
+                  </span>
+                </div>
+              </div>
 
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-600 mb-1 block">
-                    Tag de Pedágio:
-                  </label>
-                  <select
-                    value={selectedTollTag}
-                    onChange={(e) => setSelectedTollTag(e.target.value)}
-                    className="w-full text-xs font-semibold text-slate-900 bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-orange-500 focus:outline-hidden"
-                  >
-                    <option value="sem_parar">Sem Parar</option>
-                    <option value="conectcar">ConectCar</option>
-                    <option value="veloe">Veloe</option>
-                    <option value="taggy">Taggy / C6</option>
-                    <option value="dinheiro">Pagamento Manual (Dinheiro/Pix)</option>
-                  </select>
-                </div>
+              {/* Tag de Pedágio */}
+              <div>
+                <label className="text-[11px] font-semibold text-slate-600 mb-1 block">
+                  Tag de Pedágio Automático:
+                </label>
+                <select
+                  value={selectedTollTag}
+                  onChange={(e) => setSelectedTollTag(e.target.value)}
+                  className="w-full text-xs font-semibold text-slate-900 bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-orange-500 focus:outline-hidden cursor-pointer"
+                >
+                  <option value="sem_parar">Sem Parar (Passe Direto em todas as praças)</option>
+                  <option value="conectcar">ConectCar (Aceito nas principais rodovias federais/estaduais)</option>
+                  <option value="veloe">Veloe (Compatível com CCR, Arteris, Ecorodovias)</option>
+                  <option value="taggy">Taggy / C6 Bank (Cobrança direta em conta)</option>
+                  <option value="dinheiro">Pagamento Manual (Dinheiro, Cartão por Aproximação ou Pix)</option>
+                </select>
               </div>
             </div>
 
@@ -615,7 +739,7 @@ export function CarRoadTripPlanner({
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[11px] text-slate-400 block">Custo Estimado</span>
+                  <span className="text-[11px] text-slate-400 block font-medium">Custo Estimado Total</span>
                   <div className="text-lg font-black text-emerald-400">
                     R$ {calculatedRoute.totalTripCostBRL.toFixed(2).replace('.', ',')}
                   </div>
@@ -629,7 +753,7 @@ export function CarRoadTripPlanner({
                   <span className="font-bold text-slate-200">{calculatedRoute.formattedDuration}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-800/80">
-                  <span className="text-slate-400">Distância</span>
+                  <span className="text-slate-400">Distância Total</span>
                   <span className="font-bold text-slate-200">{calculatedRoute.distanceKm} km</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-800/80">
@@ -641,22 +765,28 @@ export function CarRoadTripPlanner({
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-800/80">
-                  <span className="text-slate-400">Pedágio por eixo</span>
-                  <span className="font-bold text-slate-300">
-                    R$ {calculatedRoute.tollPerAxleBRL.toFixed(2).replace('.', ',')}
+                  <span className="text-slate-400">Consumo Médio</span>
+                  <span className="font-bold text-slate-200">
+                    {customKmPerL.toFixed(1)} km/l
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-800/80">
                   <span className="text-slate-400">
-                    Combustível ({calculatedRoute.fuelLitersNeeded}L est.)
+                    Combustível ({calculatedRoute.fuelLitersNeeded}L a R$ {customFuelPrice.toFixed(2)}/l)
                   </span>
-                  <span className="font-bold text-slate-200">
+                  <span className="font-bold text-orange-300">
                     R$ {calculatedRoute.fuelTotalBRL.toFixed(2).replace('.', ',')}
                   </span>
                 </div>
-                <div className="flex justify-between pt-1 font-bold text-sm">
-                  <span className="text-white">Custo Total</span>
-                  <span className="text-emerald-400 font-extrabold">
+                <div className="flex justify-between py-1 border-b border-slate-800/80">
+                  <span className="text-slate-400">Custo Médio por KM</span>
+                  <span className="font-bold text-slate-300">
+                    R$ {(calculatedRoute.totalTripCostBRL / Math.max(calculatedRoute.distanceKm, 1)).toFixed(2).replace('.', ',')} / km
+                  </span>
+                </div>
+                <div className="flex justify-between pt-1.5 font-bold text-sm">
+                  <span className="text-white">Custo Estimado Total</span>
+                  <span className="text-emerald-400 font-extrabold text-base">
                     R$ {calculatedRoute.totalTripCostBRL.toFixed(2).replace('.', ',')}
                   </span>
                 </div>

@@ -180,7 +180,7 @@ export function FilterSidebar({
               const isChecked = !filters.milesPrograms?.length || filters.milesPrograms.includes(prog.id);
               return (
                 <label
-                  key={prog.id}
+                  key={`filter-prog-${prog.id}`}
                   className="flex items-center justify-between p-1.5 rounded-lg hover:bg-amber-100/40 cursor-pointer text-xs font-medium text-slate-800"
                 >
                   <div className="flex items-center gap-2">

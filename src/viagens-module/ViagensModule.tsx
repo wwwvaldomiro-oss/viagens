@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { 
   Plane, 
   Bus, 
+  Car,
   Sparkles, 
   Search, 
   Calendar, 
@@ -33,7 +34,7 @@ import { PriceCalendarModal } from './components/PriceCalendarModal';
 import { BookingModal } from './components/BookingModal';
 import { PriceAlertModal } from './components/PriceAlertModal';
 import { ExploreDestinations } from './components/ExploreDestinations';
-import { CarRoadTripPlanner } from './components/car-planner/CarRoadTripPlanner';
+import { LoyaltyQuoteTicker } from './components/LoyaltyQuoteTicker';
 
 export function ViagensModule({
   initialOrigin,
@@ -42,7 +43,8 @@ export function ViagensModule({
   onBookTicket,
   embedMode = 'full',
   className = '',
-  hostAppInfo
+  hostAppInfo,
+  onOpenCarPlatform
 }: ViagensModuleProps) {
   // Initial default locations
   const defaultOrigin = initialOrigin || POPULAR_LOCATIONS.find(l => l.code === 'SAO') || POPULAR_LOCATIONS[0];
@@ -145,18 +147,6 @@ export function ViagensModule({
 
   const lowestPriceToday = rawTickets.length > 0 ? Math.min(...rawTickets.map(t => t.price)) : 89;
 
-  if (query.transportType === 'car') {
-    return (
-      <div className={`w-full text-slate-900 ${className}`}>
-        <CarRoadTripPlanner
-          onBackToTickets={() => handleSearchSubmit({ ...query, transportType: 'all' })}
-          initialOriginCity={query.origin.city}
-          initialDestCity={query.destination.city}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className={`w-full text-slate-900 ${className}`}>
       {/* Search Header Container with Hero backdrop */}
@@ -177,33 +167,74 @@ export function ViagensModule({
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-bold text-sky-400 uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Módulo de Passagens Mais Baratas</span>
+              <span>Módulo de Consulta & Programação de Viagens (Voos & Ônibus)</span>
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight text-balance">
-              Compare e Encontre Passagens de Ônibus e Avião com o Menor Preço
+              Compare e Programe Passagens Aéreas e Rodoviárias
             </h1>
             <p className="text-sm text-slate-300 max-w-2xl text-balance">
-              Pesquise centenas de viações rodoviárias e companhias aéreas brasileiras em um só lugar, economizando tempo e dinheiro em cada viagem.
+              Pesquise tarifas reais em dinheiro ou milhas para voos e ônibus nacionais e internacionais, com link direto de emissão oficial.
             </p>
           </div>
 
-          {/* Embedded Search Bar */}
+          {/* Embedded Search Bar with Emission Mode */}
           <SearchBar
             query={query}
             onSearch={handleSearchSubmit}
             onOpenPriceCalendar={() => setIsCalendarOpen(true)}
             onOpenPriceAlert={() => setIsAlertOpen(true)}
+            paymentMode={filters.paymentMode}
+            onPaymentModeChange={(mode) => setFilters(prev => ({ ...prev, paymentMode: mode }))}
+            onOpenCarPlatform={onOpenCarPlatform}
           />
         </div>
       </div>
 
       {/* Main Results Workspace */}
       <div className="max-w-6xl mx-auto space-y-8">
+        {/* Banner do Novo Projeto Independente de Estradas & Pedágios */}
+        {onOpenCarPlatform && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-orange-50 via-amber-50 to-orange-100/70 border border-orange-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-orange-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Car className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-black uppercase tracking-wider text-orange-950">
+                    Novo Projeto Independente
+                  </span>
+                  <span className="text-[10px] font-bold bg-orange-200/90 text-orange-950 px-2 py-0.5 rounded-md">
+                    RODOVIAS & PEDÁGIOS BRASIL
+                  </span>
+                </div>
+                <p className="text-xs text-orange-900/90 mt-1 max-w-2xl">
+                  Vai viajar de carro particular ou gerenciar frotas? O sistema rodoviário agora é uma plataforma totalmente independente com cálculo de pedágios por eixo, postos da PRF, consumo de combustível e envio de rotas para GPS.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onOpenCarPlatform}
+              className="px-4 py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs shrink-0 flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+            >
+              <span>Acessar Plataforma Rodoviária</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* Multi-modal Comparison Banner (Bus vs Flight) */}
         <TransportComparisonBar
           tickets={rawTickets}
           currentTransportFilter={filters.transportType}
           onSelectTransportFilter={(type) => setFilters(prev => ({ ...prev, transportType: type }))}
+        />
+
+        {/* Real-time Sources & Miles Market Quotation Ticker */}
+        <LoyaltyQuoteTicker
+          paymentMode={filters.paymentMode}
+          onSelectPaymentMode={(mode) => setFilters(prev => ({ ...prev, paymentMode: mode }))}
         />
 
         {/* Results Layout: Filters Sidebar (Left) + Ticket List (Right) */}

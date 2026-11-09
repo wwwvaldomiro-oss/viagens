@@ -242,3 +242,70 @@ test('filterAndSortTickets filters by loyalty program and sorts by lowest miles'
     );
   }
 });
+
+test('Ticket extracts monetary price and calculates required points accurately with taxes', () => {
+  const sp = POPULAR_LOCATIONS.find(l => l.code === 'SAO')!;
+  const rj = POPULAR_LOCATIONS.find(l => l.code === 'RIO')!;
+  const tickets = generateTicketsForRoute(sp, rj, '2026-11-20', 'all');
+
+  assert.ok(tickets.length > 0);
+
+  tickets.forEach(ticket => {
+    // 1. Must extract valid monetary price
+    assert.ok(ticket.price > 0, 'Extracted ticket cash price must be > 0');
+    assert.ok(ticket.installments.value > 0, 'Installment value must be calculated');
+
+    // 2. Must inform necessary points
+    assert.ok(ticket.milesOption.points > 0, 'Required points must be informed');
+    assert.ok(ticket.milesOption.programName.length > 0, 'Loyalty program name required');
+    assert.ok(ticket.milesOption.cpmValueBRL > 0, 'CPM calculation required');
+
+    // 3. Must attach verified GDS or ANTT source
+    assert.ok(ticket.verifiedSource !== undefined, 'Verified provider feed must be present');
+    assert.ok(ticket.verifiedSource!.providerName.length > 0, 'Provider name must be informed');
+    assert.ok(ticket.verifiedSource!.reliability.length > 0, 'Reliability score required');
+  });
+});
+
+test('searchLocations finds international airports like Miami, Orlando, Lisbon, Paris and New York', () => {
+  const miami = searchLocations('Miami');
+  assert.ok(miami.length > 0, 'Should find Miami');
+  assert.equal(miami[0].code, 'MIA');
+
+  const lisboa = searchLocations('Lisboa');
+  assert.ok(lisboa.length > 0, 'Should find Lisboa');
+  assert.equal(lisboa[0].code, 'LIS');
+
+  const ny = searchLocations('New York');
+  assert.ok(ny.length > 0, 'Should find New York via English synonym');
+
+  const orlando = searchLocations('Orlando');
+  assert.ok(orlando.length > 0, 'Should find Orlando');
+  assert.equal(orlando[0].code, 'MCO');
+
+  const paris = searchLocations('Paris');
+  assert.ok(paris.length > 0, 'Should find Paris');
+  assert.ok(paris.some(l => l.code === 'CDG' || l.code === 'PAR'));
+});
+
+test('generateTicketsForRoute correctly handles international routes (e.g. São Paulo to Miami or Lisbon)', () => {
+  const gru = POPULAR_LOCATIONS.find(l => l.code === 'GRU')!;
+  const mia = searchLocations('MIA')[0];
+  assert.ok(mia, 'MIA should exist');
+
+  const tickets = generateTicketsForRoute(gru, mia, '2026-11-20', 'all');
+  assert.ok(tickets.length > 0, 'Should generate international tickets');
+
+  // Must only contain flight tickets (NO bus tickets to Miami!)
+  assert.ok(tickets.every(t => t.type === 'flight'), 'International route to Miami must not contain bus options');
+
+  // Must be marked as international and have valid direct emission link
+  tickets.forEach(ticket => {
+    assert.equal(ticket.isInternational, true, 'Ticket must be marked as international');
+    assert.ok(ticket.price >= 2000, 'International long-haul flight price must be realistic (>= R$ 2000)');
+    assert.ok(ticket.durationMinutes > 400, 'Flight to Miami should have realistic duration (> 400 mins)');
+    assert.ok(ticket.offerEmissionUrl.startsWith('https://'), 'Must have official emission URL');
+    assert.ok(ticket.milesOption.points >= 40000, 'International flight miles should be realistic (>= 40.000 pts)');
+  });
+});
+

@@ -36,6 +36,78 @@ export const AIRLINES: Company[] = [
     code: '2Z',
     rating: 4.1,
     color: 'from-emerald-700 to-teal-800'
+  },
+  {
+    id: 'tap',
+    name: 'TAP Air Portugal',
+    type: 'flight',
+    logoText: 'TAP',
+    code: 'TP',
+    rating: 4.7,
+    color: 'from-emerald-800 to-red-700'
+  },
+  {
+    id: 'american',
+    name: 'American Airlines',
+    type: 'flight',
+    logoText: 'AA',
+    code: 'AA',
+    rating: 4.5,
+    color: 'from-blue-700 to-red-600'
+  },
+  {
+    id: 'airfrance',
+    name: 'Air France',
+    type: 'flight',
+    logoText: 'AF',
+    code: 'AF',
+    rating: 4.8,
+    color: 'from-blue-900 to-sky-600'
+  },
+  {
+    id: 'iberia',
+    name: 'Iberia Líneas Aéreas',
+    type: 'flight',
+    logoText: 'IBERIA',
+    code: 'IB',
+    rating: 4.5,
+    color: 'from-red-700 to-amber-600'
+  },
+  {
+    id: 'united',
+    name: 'United Airlines',
+    type: 'flight',
+    logoText: 'UNITED',
+    code: 'UA',
+    rating: 4.4,
+    color: 'from-blue-950 to-blue-700'
+  },
+  {
+    id: 'british',
+    name: 'British Airways',
+    type: 'flight',
+    logoText: 'BA',
+    code: 'BA',
+    rating: 4.7,
+    color: 'from-blue-800 to-red-700'
+  },
+  {
+    id: 'emirates',
+    name: 'Emirates Airline',
+    type: 'flight',
+    logoText: 'EK',
+    code: 'EK',
+    rating: 4.9,
+    color: 'from-red-800 to-amber-600'
+  },
+  {
+    id: 'aerolineas',
+    name: 'Aerolíneas Argentinas',
+    type: 'flight',
+    logoText: 'AR',
+    code: 'AR',
+    rating: 4.3,
+    color: 'from-sky-600 to-sky-400'
   }
 ];
 
